@@ -5,6 +5,7 @@ import lombok.*;
 import team2.lmssystem.enums.Role;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -31,12 +32,14 @@ public class User {
 
     private Integer leaveBalance;
 
-    @ManyToOne
-    @JoinColumn(name = "manager_id")
-    private User manager;
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id")
     private Department department;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "manager_id")
+    private User manager;
+
+    @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
+    private List<LeaveApplication> leaveApplications;
 }

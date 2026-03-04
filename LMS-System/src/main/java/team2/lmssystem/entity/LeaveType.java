@@ -11,11 +11,16 @@ import lombok.*;
 @Setter
 @Builder
 public class LeaveType {
-    //fields
+
     @Id
-    @GeneratedValue( strategy = jakarta.persistence.GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long leaveTypeId;
 
     @Column(name = "leave_type_name")
-    private String leaveTypeName;
+    private String name;
+
+    private Integer maxDaysPerYear;
+
+    private Boolean requiresProof;
+
 }

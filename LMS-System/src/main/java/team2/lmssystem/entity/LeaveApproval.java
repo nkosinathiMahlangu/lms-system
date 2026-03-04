@@ -11,16 +11,19 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(name = "leave_approvals")
 public class LeaveApproval {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long approvalId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "leave_id")
     private LeaveApplication leaveApplication;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "approver_id")
     private User approver;
 
     private Integer stage;
@@ -30,4 +33,5 @@ public class LeaveApproval {
     private LocalDateTime decisionDate;
 
     private String comments;
+
 }

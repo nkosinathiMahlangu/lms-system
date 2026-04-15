@@ -5,22 +5,20 @@ import lombok.*;
 
 @Entity
 @Table(name = "leave_types")
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class LeaveType {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long leaveTypeId;
+    private Long id;
 
-    @Column(name = "leave_type_name")
+    @Column(nullable = false, unique = true)
     private String name;
 
-    private Integer maxDaysPerYear;
-
-    private Boolean requiresProof;
-
+    // Total days allowed per year
+    private int defaultDays;
 }

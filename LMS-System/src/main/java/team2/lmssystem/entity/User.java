@@ -2,10 +2,8 @@ package team2.lmssystem.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import team2.lmssystem.enums.Role;
 
-import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -15,28 +13,34 @@ import java.util.List;
 @Setter
 @Builder
 public class User {
-    //fields
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
-    private String name;
+    @Column(nullable = false)
+    private String firstName;
 
-    @Column(unique = true)
+    @Column(nullable = false)
+    private String lastName;
+
+    @Column(unique = true, nullable = false)
     private String email;
 
+    @Column(unique = true, nullable = false)
+    private String username;
+
+    @Column(nullable = false)
     private String password;
 
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    private boolean enabled = true;
 
-    private Integer leaveBalance;
-
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "manager_id")
-    private User manager;
-
-    @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
-    private List<LeaveApplication> leaveApplications;
+    // Many-to-Many with Role entity
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles;
 }

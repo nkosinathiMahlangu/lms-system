@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 import team2.lmssystem.dto.request.CreateUserDTO;
 import team2.lmssystem.dto.request.respond.UserResponseDTO;
 import team2.lmssystem.service.LeaveService;
-import team2.lmssystem.service.UserService;
 
 @RestController
 @RequestMapping("/api/admin")

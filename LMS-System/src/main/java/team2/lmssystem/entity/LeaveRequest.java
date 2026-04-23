@@ -2,7 +2,7 @@ package team2.lmssystem.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.Id;
+import team2.lmssystem.enums.LeaveStatus;
 
 import java.time.LocalDate;
 

@@ -1,6 +1,7 @@
 package team2.lmssystem.security;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;
 import team2.lmssystem.entity.User;

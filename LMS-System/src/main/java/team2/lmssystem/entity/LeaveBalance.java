@@ -17,7 +17,7 @@ public class LeaveBalance {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // ✅Owning side
+    // Owning side
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;

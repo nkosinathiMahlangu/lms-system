@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import team2.lmssystem.dto.request.ForgotPasswordRequest;
 import team2.lmssystem.dto.request.LoginRequest;
-import team2.lmssystem.dto.request.ResetPasswordRequest;
+import team2.lmssystem.dto.request.VerifyOtpResetPasswordRequest;
 import team2.lmssystem.dto.respond.ApiResponse;
 import team2.lmssystem.dto.respond.AuthResponse;
 import team2.lmssystem.service.authservice.AuthService;
@@ -53,14 +53,13 @@ public class AuthController {
     }
 
     // 🔑 Reset Password
-    @PostMapping("/reset-password")
-    public ResponseEntity<ApiResponse<String>> resetPassword(
-            @RequestBody ResetPasswordRequest request) {
+    @PostMapping("/verify-otp")
+    public ResponseEntity<ApiResponse<String>> verifyOtp(
+            @Valid
+            @RequestBody VerifyOtpResetPasswordRequest request) {
 
-        String response = authService.resetPassword(
-                request.getToken(),
-                request.getNewPassword()
-        );
+        String response =
+                authService.verifyOtpAndResetPassword(request);
 
         return ResponseEntity.ok(
                 ApiResponse.<String>builder()

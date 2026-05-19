@@ -1,6 +1,7 @@
 package team2.lmssystem.service.authservice;
 
 import team2.lmssystem.dto.request.LoginRequest;
+import team2.lmssystem.dto.request.VerifyOtpResetPasswordRequest;
 import team2.lmssystem.dto.respond.AuthResponse;
 
 public interface AuthService {
@@ -8,5 +9,5 @@ public interface AuthService {
 
     String forgotPassword(String email);
 
-    String resetPassword(String token, String newPassword);
+    String verifyOtpAndResetPassword(VerifyOtpResetPasswordRequest request);
 }

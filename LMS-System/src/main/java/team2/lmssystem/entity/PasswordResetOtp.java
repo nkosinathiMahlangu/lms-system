@@ -4,25 +4,26 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-
 @Entity
-@Table(name = "password_reset_tokens")
+@Table(name = "password_reset_otps")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PasswordResetToken {
+public class PasswordResetOtp {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String token;
+    private String otp;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
     private LocalDateTime expiryDate;
+
+    private boolean used;
 }

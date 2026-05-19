@@ -18,7 +18,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    @Autowired
     private final JwtFilter jwtFilter;
 
     @Bean
@@ -31,13 +30,13 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
 
-                        // 🔓 Public endpoints
+                        // Public endpoints
                         .requestMatchers("/auth/**").permitAll()
 
-                        // 🔐 Admin only
+                        // Admin only
                         .requestMatchers("/admin/**").hasRole("ADMIN")
 
-                        // 🔐 Employee only
+                        // Employee only
                         .requestMatchers("/employee/**").hasRole("EMPLOYEE")
 
                         // everything else secured

@@ -4,6 +4,11 @@ import jakarta.persistence.*;
 import lombok.*;
 import team2.lmssystem.enums.RoleName;
 
+/**
+ * Security role assigned to a {@link User} (ADMIN or EMPLOYEE).
+ * Rows are pre-seeded — never created at runtime.
+ * Table: {@code roles}
+ */
 @Entity
 @Table(name = "roles")
 @Getter

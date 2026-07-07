@@ -14,6 +14,7 @@ import team2.lmssystem.dto.respond.ApiResponse;
 import team2.lmssystem.dto.respond.AuthResponse;
 import team2.lmssystem.service.authservice.AuthService;
 
+/** Public authentication endpoints — no JWT required. */
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -21,51 +22,34 @@ public class AuthController {
 
     private final AuthService authService;
 
-    // 🔐 Login
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthResponse>> login(
             @Valid @RequestBody LoginRequest request) {
 
-        AuthResponse response = authService.login(request);
-
-        return ResponseEntity.ok(
-                ApiResponse.<AuthResponse>builder()
-                        .success(true)
-                        .message("Login successful")
-                        .data(response)
-                        .build()
-        );
+        return ResponseEntity.ok(ApiResponse.<AuthResponse>builder()
+                .success(true)
+                .message("Login successful")
+                .data(authService.login(request))
+                .build());
     }
 
-    // 📧 Forgot Password
     @PostMapping("/forgot-password")
     public ResponseEntity<ApiResponse<String>> forgotPassword(
-            @RequestBody ForgotPasswordRequest request) {
+            @Valid @RequestBody ForgotPasswordRequest request) {
 
-        String response = authService.forgotPassword(request.getEmail());
-
-        return ResponseEntity.ok(
-                ApiResponse.<String>builder()
-                        .success(true)
-                        .message(response)
-                        .build()
-        );
+        return ResponseEntity.ok(ApiResponse.<String>builder()
+                .success(true)
+                .message(authService.forgotPassword(request.getEmail()))
+                .build());
     }
 
-    // 🔑 Reset Password
     @PostMapping("/verify-otp")
     public ResponseEntity<ApiResponse<String>> verifyOtp(
-            @Valid
-            @RequestBody VerifyOtpResetPasswordRequest request) {
+            @Valid @RequestBody VerifyOtpResetPasswordRequest request) {
 
-        String response =
-                authService.verifyOtpAndResetPassword(request);
-
-        return ResponseEntity.ok(
-                ApiResponse.<String>builder()
-                        .success(true)
-                        .message(response)
-                        .build()
-        );
+        return ResponseEntity.ok(ApiResponse.<String>builder()
+                .success(true)
+                .message(authService.verifyOtpAndResetPassword(request))
+                .build());
     }
 }

@@ -31,3 +31,13 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# ---------------------------------------------------------------------------
+# Secrets — these files contain real credentials and must NEVER be committed.
+# application.properties uses ${ENV_VAR:placeholder} syntax so it is safe
+# to commit. Put your actual values here for local development only.
+# ---------------------------------------------------------------------------
+src/main/resources/application-secrets.properties
+src/main/resources/application-local.properties
+*.env
+.env

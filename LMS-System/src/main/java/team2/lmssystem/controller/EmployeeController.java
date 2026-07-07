@@ -12,6 +12,7 @@ import team2.lmssystem.service.leaveservice.LeaveService;
 import java.security.Principal;
 import java.util.List;
 
+/** Employee-only endpoints — requires ROLE_EMPLOYEE. */
 @RestController
 @RequestMapping("/employee")
 @RequiredArgsConstructor
@@ -19,40 +20,25 @@ public class EmployeeController {
 
     private final LeaveService leaveService;
 
-    // Apply Leave
     @PostMapping("/leave/apply")
     public ResponseEntity<ApiResponse<String>> applyLeave(
             @Valid @RequestBody ApplyLeaveRequest request,
             Principal principal) {
 
-        String response = leaveService.applyLeave(
-                principal.getName(),
-                request
-        );
-
-        return ResponseEntity.ok(
-                ApiResponse.<String>builder()
-                        .success(true)
-                        .message(response)
-                        .build()
-        );
+        // Username sourced from JWT — employees can only act on their own account
+        return ResponseEntity.ok(ApiResponse.<String>builder()
+                .success(true)
+                .message(leaveService.applyLeave(principal.getName(), request))
+                .build());
     }
 
-    // 📄 View Own Leaves
     @GetMapping("/leave")
-    public ResponseEntity<ApiResponse<List<LeaveResponse>>> getMyLeaves(
-            Principal principal) {
+    public ResponseEntity<ApiResponse<List<LeaveResponse>>> getMyLeaves(Principal principal) {
 
-        List<LeaveResponse> leaves = leaveService.getUserLeaves(
-                principal.getName()
-        );
-
-        return ResponseEntity.ok(
-                ApiResponse.<List<LeaveResponse>>builder()
-                        .success(true)
-                        .message("Leave requests fetched")
-                        .data(leaves)
-                        .build()
-        );
+        return ResponseEntity.ok(ApiResponse.<List<LeaveResponse>>builder()
+                .success(true)
+                .message("Leave requests fetched successfully")
+                .data(leaveService.getUserLeaves(principal.getName()))
+                .build());
     }
 }

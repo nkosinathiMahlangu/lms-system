@@ -3,6 +3,11 @@ package team2.lmssystem.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+/**
+ * Category of leave an employee can apply for (e.g. Annual Leave, Sick Leave).
+ * {@code defaultDays} is the annual quota used when seeding a new employee's balance.
+ * Table: {@code leave_types}
+ */
 @Entity
 @Table(name = "leave_types")
 @Getter
@@ -19,6 +24,5 @@ public class LeaveType {
     @Column(nullable = false, unique = true)
     private String name;
 
-    // Total days allowed per year
     private int defaultDays;
 }

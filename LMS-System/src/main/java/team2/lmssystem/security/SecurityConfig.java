@@ -1,7 +1,6 @@
 package team2.lmssystem.security;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -13,6 +12,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.*;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+/**
+ * Security configuration — stateless JWT, CSRF disabled, role-based route access.
+ *
+ * Routes:
+ *   /auth/**      → public
+ *   /admin/**     → ADMIN only
+ *   /employee/**  → EMPLOYEE only
+ */
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -22,24 +29,14 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
         http
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-
-                        // Public endpoints
                         .requestMatchers("/auth/**").permitAll()
-
-                        // Admin only
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-
-                        // Employee only
                         .requestMatchers("/employee/**").hasRole("EMPLOYEE")
-
-                        // everything else secured
                         .anyRequest().authenticated()
                 );
 
@@ -54,8 +51,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration config) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
+            throws Exception {
         return config.getAuthenticationManager();
     }
 }

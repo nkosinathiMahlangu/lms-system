@@ -14,7 +14,7 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendEmail(String to, String subject, String body) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("noreply@lmssystem.com"); // any sender name works in Mailtrap
+        message.setFrom("noreply@lmssystem.com");
         message.setTo(to);
         message.setSubject(subject);
         message.setText(body);

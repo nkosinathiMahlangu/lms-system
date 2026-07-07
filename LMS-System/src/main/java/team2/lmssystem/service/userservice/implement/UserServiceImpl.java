@@ -8,6 +8,8 @@ import team2.lmssystem.dto.respond.UserResponse;
 import team2.lmssystem.entity.Role;
 import team2.lmssystem.entity.User;
 import team2.lmssystem.enums.RoleName;
+import team2.lmssystem.exception.DuplicateResourceException;
+import team2.lmssystem.exception.ResourceNotFoundException;
 import team2.lmssystem.repository.RoleRepository;
 import team2.lmssystem.repository.UserRepository;
 import team2.lmssystem.service.userservice.UserService;
@@ -26,21 +28,22 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String createUser(CreateUserRequest request) {
-
         if (userRepository.existsByUsername(request.getUsername())) {
-            return "Username already exists";
+            throw new DuplicateResourceException("User", "username", request.getUsername());
         }
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            return "Email already exists";
+            throw new DuplicateResourceException("User", "email", request.getEmail());
         }
 
-        RoleName roleName = RoleName.valueOf(request.getRole());
+        // valueOf throws IllegalArgumentException if the role string is invalid —
+        // caught by GlobalExceptionHandler and returned as HTTP 400
+        RoleName roleName = RoleName.valueOf(request.getRole().toUpperCase());
 
         Role role = roleRepository.findByName(roleName)
-                .orElseThrow(() -> new RuntimeException("Role not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Role", "name", roleName.name()));
 
-        User user = User.builder()
+        userRepository.save(User.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .username(request.getUsername())
@@ -48,17 +51,13 @@ public class UserServiceImpl implements UserService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .roles(Set.of(role))
                 .enabled(true)
-                //.passwordChanged(false) // 🔥 force first change
-                .build();
-
-        userRepository.save(user);
+                .build());
 
         return "User created successfully";
     }
 
     @Override
     public List<UserResponse> getAllUsers() {
-
         return userRepository.findAll().stream()
                 .map(user -> UserResponse.builder()
                         .id(user.getUserId())

@@ -4,6 +4,13 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+
+/**
+ * Short-lived OTP record used in the forgot-password flow.
+ * Valid for 3 minutes; marked {@code used = true} after a successful reset
+ * to prevent replay attacks.
+ * Table: {@code password_reset_otps}
+ */
 @Entity
 @Table(name = "password_reset_otps")
 @Getter

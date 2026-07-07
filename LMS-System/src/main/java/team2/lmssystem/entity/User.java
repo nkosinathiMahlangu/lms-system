@@ -5,6 +5,10 @@ import lombok.*;
 
 import java.util.Set;
 
+/**
+ * Represents a system user — either an ADMIN or an EMPLOYEE.
+ * Table: {@code users}
+ */
 @Entity
 @Table(name = "users")
 @AllArgsConstructor
@@ -33,9 +37,11 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    // Soft-disable without deleting the account
     private boolean enabled = true;
 
-    // Many-to-Many with Role entity
+    // Fetched EAGERLY so Spring Security can read authorities
+    // outside of an active Hibernate session (e.g. inside JwtFilter)
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_roles",

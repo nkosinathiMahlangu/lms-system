@@ -9,12 +9,10 @@ import java.util.List;
 
 public interface LeaveRequestRepository extends JpaRepository<LeaveRequest, Long> {
 
-    // Employee view
     List<LeaveRequest> findByUser(User user);
 
-    // Admin dashboard
+    // Admin dashboard — typically used to list PENDING requests
     List<LeaveRequest> findByStatus(LeaveStatus status);
 
-    // Combined filter
     List<LeaveRequest> findByUserAndStatus(User user, LeaveStatus status);
 }

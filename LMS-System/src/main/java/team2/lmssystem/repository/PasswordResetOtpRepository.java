@@ -6,6 +6,6 @@ import team2.lmssystem.entity.PasswordResetOtp;
 import java.util.Optional;
 
 public interface PasswordResetOtpRepository extends JpaRepository<PasswordResetOtp, Long> {
-  //
+
     Optional<PasswordResetOtp> findByOtp(String otp);
 }

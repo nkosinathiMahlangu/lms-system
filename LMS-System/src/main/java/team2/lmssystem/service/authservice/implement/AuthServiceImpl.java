@@ -29,15 +29,14 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponse login(LoginRequest request) {
+        // orElse(null) so both "user not found" and "wrong password" take the same code path,
+        // preventing timing-based username enumeration
+        User user = userRepository.findByUsername(request.getUsername()).orElse(null);
 
-        User user = userRepository.findByUsername(request.getUsername())
-                .orElse(null);
-
-        // Secure login
         if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid username or password");
+            throw new UnauthorizedException("Invalid username or password");
         }
-        //token generator
+
         String token = jwtUtil.generateToken(user.getUsername());
 
         return AuthResponse.builder()
@@ -49,29 +48,23 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public String forgotPassword(String email) {
-
-        User user = userRepository.findByEmail(email)
-                .orElse(null);
+        // Silently skip unknown emails — same response either way to prevent user enumeration
+        User user = userRepository.findByEmail(email).orElse(null);
 
         if (user != null) {
-
             String otp = generateOtp();
 
-            PasswordResetOtp resetOtp =
-                    PasswordResetOtp.builder()
-                            .otp(otp)
-                            .user(user)
-                            .expiryDate(LocalDateTime.now().plusMinutes(3))
-                            .used(false)
-                            .build();
-
-            otpRepository.save(resetOtp);
+            otpRepository.save(PasswordResetOtp.builder()
+                    .otp(otp)
+                    .user(user)
+                    .expiryDate(LocalDateTime.now().plusMinutes(3))
+                    .used(false)
+                    .build());
 
             emailService.sendEmail(
                     user.getEmail(),
                     "Password Reset OTP",
-                    "Your OTP is: " + otp +
-                            "\nExpires in 3 minutes."
+                    "Your OTP is: " + otp + "\nThis OTP expires in 3 minutes."
             );
         }
 
@@ -79,45 +72,28 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String verifyOtpAndResetPassword(
-            VerifyOtpResetPasswordRequest request) {
+    public String verifyOtpAndResetPassword(VerifyOtpResetPasswordRequest request) {
+        PasswordResetOtp resetOtp = otpRepository.findByOtp(request.getOtp())
+                .orElseThrow(() -> new UnauthorizedException("Invalid or expired OTP"));
 
-        PasswordResetOtp resetOtp =
-                otpRepository.findByOtp(request.getOtp())
-                        .orElseThrow(() ->
-                                new UnauthorizedException(
-                                        "Invalid or expired OTP"));
-
-        if (resetOtp.isUsed() ||
-                resetOtp.getExpiryDate()
-                        .isBefore(LocalDateTime.now())) {
-
-            throw new UnauthorizedException(
-                    "Invalid or expired OTP");
+        // Reject if already consumed or past the 3-minute window
+        if (resetOtp.isUsed() || resetOtp.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new UnauthorizedException("Invalid or expired OTP");
         }
 
         User user = resetOtp.getUser();
-
-        user.setPassword(
-                passwordEncoder.encode(
-                        request.getNewPassword()
-                )
-        );
-
-
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
 
+        // Mark used to prevent replay attacks
         resetOtp.setUsed(true);
-
         otpRepository.save(resetOtp);
 
         return "Password reset successful";
     }
-    //otp generator method
+
+    /** Generates a 6-digit OTP in the range [100000, 999999]. */
     private String generateOtp() {
-
-        int otp = (int) (Math.random() * 900000) + 100000;
-
-        return String.valueOf(otp);
+        return String.valueOf((int) (Math.random() * 900000) + 100000);
     }
 }

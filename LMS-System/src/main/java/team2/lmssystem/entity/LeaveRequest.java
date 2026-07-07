@@ -6,6 +6,11 @@ import team2.lmssystem.enums.LeaveStatus;
 
 import java.time.LocalDate;
 
+/**
+ * A single leave application submitted by an employee.
+ * Lifecycle: PENDING → APPROVED (balance deducted) or REJECTED (balance unchanged).
+ * Table: {@code leave_requests}
+ */
 @Entity
 @Table(name = "leave_requests")
 @Getter
@@ -19,12 +24,10 @@ public class LeaveRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Who applied
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    // Type of leave
     @ManyToOne
     @JoinColumn(name = "leave_type_id", nullable = false)
     private LeaveType leaveType;
@@ -32,6 +35,7 @@ public class LeaveRequest {
     private LocalDate startDate;
     private LocalDate endDate;
 
+    // Stored for quick access — calculated as (endDate - startDate + 1)
     private int numberOfDays;
 
     private String reason;
@@ -39,7 +43,7 @@ public class LeaveRequest {
     @Enumerated(EnumType.STRING)
     private LeaveStatus status;
 
-    // Admin who approved/rejected
+    // Null while PENDING; set when an admin approves or rejects
     @ManyToOne
     @JoinColumn(name = "approved_by")
     private User approvedBy;

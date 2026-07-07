@@ -9,6 +9,11 @@ import team2.lmssystem.repository.UserRepository;
 
 import java.util.stream.Collectors;
 
+/**
+ * Loads a user from the database for Spring Security authentication.
+ * Role names are stored as plain strings (e.g. "ADMIN") — Spring's hasRole()
+ * prepends "ROLE_" automatically, so we must NOT store "ROLE_ADMIN" here.
+ */
 @Service
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
@@ -17,7 +22,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-
+        // Generic error message — avoids leaking whether the username exists
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Invalid credentials"));
 

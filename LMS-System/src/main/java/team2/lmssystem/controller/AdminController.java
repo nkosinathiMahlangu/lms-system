@@ -14,6 +14,7 @@ import team2.lmssystem.service.userservice.UserService;
 import java.security.Principal;
 import java.util.List;
 
+/** Admin-only endpoints — requires ROLE_ADMIN. */
 @RestController
 @RequestMapping("/admin")
 @RequiredArgsConstructor
@@ -22,52 +23,35 @@ public class AdminController {
     private final UserService userService;
     private final LeaveService leaveService;
 
-    // 👤 Create User
     @PostMapping("/users")
     public ResponseEntity<ApiResponse<String>> createUser(
             @Valid @RequestBody CreateUserRequest request) {
 
-        String response = userService.createUser(request);
-
-        return ResponseEntity.ok(
-                ApiResponse.<String>builder()
-                        .success(true)
-                        .message(response)
-                        .build()
-        );
+        return ResponseEntity.ok(ApiResponse.<String>builder()
+                .success(true)
+                .message(userService.createUser(request))
+                .build());
     }
 
-    // Get All Users
     @GetMapping("/users")
     public ResponseEntity<ApiResponse<List<UserResponse>>> getAllUsers() {
 
-        List<UserResponse> users = userService.getAllUsers();
-
-        return ResponseEntity.ok(
-                ApiResponse.<List<UserResponse>>builder()
-                        .success(true)
-                        .message("Users fetched successfully")
-                        .data(users)
-                        .build()
-        );
+        return ResponseEntity.ok(ApiResponse.<List<UserResponse>>builder()
+                .success(true)
+                .message("Users fetched successfully")
+                .data(userService.getAllUsers())
+                .build());
     }
 
-    // Approve / Reject Leave
     @PutMapping("/leave/action")
     public ResponseEntity<ApiResponse<String>> processLeave(
             @Valid @RequestBody LeaveActionRequest request,
             Principal principal) {
 
-        String response = leaveService.approveOrRejectLeave(
-                principal.getName(),
-                request
-        );
-
-        return ResponseEntity.ok(
-                ApiResponse.<String>builder()
-                        .success(true)
-                        .message(response)
-                        .build()
-        );
+        // principal.getName() comes from the JWT subject — identifies the acting admin
+        return ResponseEntity.ok(ApiResponse.<String>builder()
+                .success(true)
+                .message(leaveService.approveOrRejectLeave(principal.getName(), request))
+                .build());
     }
 }

@@ -23,7 +23,6 @@ import lombok.Setter;
 @Builder
 public class UserResponse {
 
-    /** The database-generated user ID. */
     private Long id;
 
     /** User's first name. */
@@ -38,5 +37,4 @@ public class UserResponse {
     /** User's login username. */
     private String username;
 
-    // NOTE: password is intentionally omitted — never expose the hash in a response
 }

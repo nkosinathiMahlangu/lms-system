@@ -2,6 +2,8 @@ package team2.lmssystem.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -149,6 +151,38 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.builder()
                         .success(false)
                         .message(ex.getMessage())
+                        .build());
+    }
+
+    // -------------------------------------------------------------------------
+    // 400 — Unreadable request body (e.g. invalid date format)
+    // -------------------------------------------------------------------------
+
+    // Thrown when Spring can't deserialize the request body —
+    // e.g. "2026-13-45" can't be parsed into LocalDate
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiResponse<Object>> handleUnreadableMessage(HttpMessageNotReadableException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.builder()
+                        .success(false)
+                        .message("Invalid request format. Check your date fields — expected format is YYYY-MM-DD.")
+                        .build());
+    }
+
+    // -------------------------------------------------------------------------
+    // 409 — Database constraint violation (e.g. delete leave type still in use)
+    // -------------------------------------------------------------------------
+
+    // Thrown by PostgreSQL when a foreign key constraint is violated —
+    // e.g. deleting a leave_type that still has rows in leave_balances or leave_requests
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiResponse<Object>> handleDataIntegrity(DataIntegrityViolationException ex) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(ApiResponse.builder()
+                        .success(false)
+                        .message("Cannot delete this leave type — employees still have balances or leave history linked to it. Remove those records first.")
                         .build());
     }
 

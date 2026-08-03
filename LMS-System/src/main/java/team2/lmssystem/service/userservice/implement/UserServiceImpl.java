@@ -5,11 +5,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import team2.lmssystem.dto.request.CreateUserRequest;
 import team2.lmssystem.dto.respond.UserResponse;
+import team2.lmssystem.entity.LeaveBalance;
 import team2.lmssystem.entity.Role;
 import team2.lmssystem.entity.User;
 import team2.lmssystem.enums.RoleName;
+import team2.lmssystem.exception.BadRequestException;
 import team2.lmssystem.exception.DuplicateResourceException;
 import team2.lmssystem.exception.ResourceNotFoundException;
+import team2.lmssystem.repository.LeaveBalanceRepository;
+import team2.lmssystem.repository.LeaveTypeRepository;
 import team2.lmssystem.repository.RoleRepository;
 import team2.lmssystem.repository.UserRepository;
 import team2.lmssystem.service.userservice.UserService;
@@ -24,6 +28,8 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final LeaveTypeRepository leaveTypeRepository;
+    private final LeaveBalanceRepository leaveBalanceRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -43,7 +49,7 @@ public class UserServiceImpl implements UserService {
         Role role = roleRepository.findByName(roleName)
                 .orElseThrow(() -> new ResourceNotFoundException("Role", "name", roleName.name()));
 
-        userRepository.save(User.builder()
+        User user = userRepository.save(User.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .username(request.getUsername())
@@ -52,6 +58,18 @@ public class UserServiceImpl implements UserService {
                 .roles(Set.of(role))
                 .enabled(true)
                 .build());
+
+        // Auto-seed leave balances for every leave type when an EMPLOYEE is created.
+        // ADMIN accounts don't need balances since they don't apply for leave.
+        if (roleName == RoleName.EMPLOYEE) {
+            leaveTypeRepository.findAll().forEach(leaveType ->
+                    leaveBalanceRepository.save(LeaveBalance.builder()
+                            .user(user)
+                            .leaveType(leaveType)
+                            .remainingDays(leaveType.getDefaultDays())
+                            .build())
+            );
+        }
 
         return "User created successfully";
     }
@@ -67,5 +85,23 @@ public class UserServiceImpl implements UserService {
                         .username(user.getUsername())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public String deleteUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+
+        // Prevent admin from deleting themselves or other admins —
+        // only EMPLOYEE accounts can be removed this way
+        boolean isAdmin = user.getRoles().stream()
+                .anyMatch(role -> role.getName() == RoleName.ADMIN);
+
+        if (isAdmin) {
+            throw new BadRequestException("Admin accounts cannot be deleted through this endpoint");
+        }
+
+        userRepository.delete(user);
+        return "Employee '" + user.getUsername() + "' deleted successfully";
     }
 }

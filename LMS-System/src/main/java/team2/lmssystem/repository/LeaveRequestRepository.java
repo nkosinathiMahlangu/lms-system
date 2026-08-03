@@ -2,6 +2,7 @@ package team2.lmssystem.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import team2.lmssystem.entity.LeaveRequest;
+import team2.lmssystem.entity.LeaveType;
 import team2.lmssystem.entity.User;
 import team2.lmssystem.enums.LeaveStatus;
 
@@ -15,4 +16,7 @@ public interface LeaveRequestRepository extends JpaRepository<LeaveRequest, Long
     List<LeaveRequest> findByStatus(LeaveStatus status);
 
     List<LeaveRequest> findByUserAndStatus(User user, LeaveStatus status);
+
+    // Used to block duplicate pending requests for the same leave type
+    boolean existsByUserAndLeaveTypeAndStatus(User user, LeaveType leaveType, LeaveStatus status);
 }

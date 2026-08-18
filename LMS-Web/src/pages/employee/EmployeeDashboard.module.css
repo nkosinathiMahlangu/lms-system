@@ -1,0 +1,93 @@
+.page { max-width: 960px; }
+
+/* Hero */
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(120deg, var(--grey-dark) 0%, #4B5563 100%);
+  border-radius: var(--radius-lg);
+  padding: 28px 32px;
+  margin-bottom: 32px;
+  gap: 16px;
+}
+
+.greetSub  { font-size: 14px; color: var(--orange-light); font-weight: 500; }
+.greetName { font-size: 28px; font-weight: 700; color: #fff; margin: 4px 0; }
+.greetHint { font-size: 13px; color: #9CA3AF; }
+
+.applyBtn {
+  background: var(--orange);
+  color: #fff;
+  padding: 11px 20px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background .2s;
+}
+.applyBtn:hover { background: var(--orange-hover); }
+
+/* Section */
+.sectionTitle  { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 14px; }
+.sectionHeader { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.viewAll       { font-size: 13px; color: var(--orange); font-weight: 500; }
+.viewAll:hover { color: var(--orange-dark); }
+
+/* Balance grid */
+.balanceGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
+}
+
+.balanceCard {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px 16px;
+  text-align: center;
+  transition: box-shadow .2s, border-color .2s;
+}
+.balanceCard:hover { box-shadow: var(--shadow-md); border-color: var(--orange-light); }
+
+.balanceType  { font-size: 12px; font-weight: 600; color: var(--grey-mid); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
+.balanceDays  { font-size: 40px; font-weight: 700; color: var(--orange); line-height: 1; }
+.balanceLabel { font-size: 12px; color: var(--grey-light); margin-top: 4px; }
+
+/* Table */
+.tableWrap {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.table thead th {
+  background: var(--surface-2);
+  padding: 11px 16px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--grey-mid);
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  border-bottom: 1px solid var(--border);
+}
+
+.table tbody tr { transition: background .12s; }
+.table tbody tr:hover { background: var(--surface-2); }
+.table tbody td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+.table tbody tr:last-child td { border-bottom: none; }
+
+.empty { color: var(--grey-mid); font-size: 14px; }

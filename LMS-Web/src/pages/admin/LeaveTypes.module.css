@@ -1,0 +1,73 @@
+.page  { max-width: 720px; }
+.title { font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 20px; }
+
+.tableWrap {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.table {
+  width: 100%; border-collapse: collapse; font-size: 14px;
+}
+
+.table thead th {
+  background: var(--surface-2);
+  padding: 11px 16px;
+  text-align: left;
+  font-size: 12px; font-weight: 600; color: var(--grey-mid);
+  text-transform: uppercase; letter-spacing: .4px;
+  border-bottom: 1px solid var(--border);
+}
+
+.table tbody tr { transition: background .12s; }
+.table tbody tr:hover { background: var(--surface-2); }
+.table tbody td {
+  padding: 13px 16px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle;
+}
+.table tbody tr:last-child td { border-bottom: none; }
+
+.emptyCell { text-align: center; color: var(--grey-mid); padding: 24px; }
+
+.inlineInput {
+  padding: 7px 10px;
+  border: 1.5px solid var(--orange);
+  border-radius: var(--radius);
+  font-size: 14px; color: var(--text);
+  background: var(--surface-2);
+  outline: none;
+}
+
+.btnGroup { display: flex; gap: 8px; }
+
+.editBtn {
+  padding: 5px 14px;
+  border: 1.5px solid var(--orange);
+  border-radius: 6px; background: transparent; color: var(--orange);
+  font-size: 12px; font-weight: 600; transition: all .15s;
+}
+.editBtn:hover { background: var(--orange); color: #fff; }
+
+.deleteBtn {
+  padding: 5px 12px;
+  border: 1.5px solid var(--red);
+  border-radius: 6px; background: transparent; color: var(--red);
+  font-size: 12px; font-weight: 600; transition: all .15s;
+}
+.deleteBtn:hover { background: var(--red); color: #fff; }
+
+.saveBtn {
+  padding: 5px 14px;
+  background: var(--green); color: #fff; border: none;
+  border-radius: 6px; font-size: 12px; font-weight: 600; transition: opacity .15s;
+}
+.saveBtn:disabled { opacity: .6; cursor: not-allowed; }
+
+.cancelBtn {
+  padding: 5px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 6px; background: transparent; color: var(--grey-dark);
+  font-size: 12px; font-weight: 600;
+}
+.cancelBtn:hover { background: var(--surface-2); }

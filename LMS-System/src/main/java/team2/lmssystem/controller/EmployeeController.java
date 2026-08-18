@@ -8,6 +8,7 @@ import team2.lmssystem.dto.request.ApplyLeaveRequest;
 import team2.lmssystem.dto.respond.ApiResponse;
 import team2.lmssystem.dto.respond.LeaveBalanceResponse;
 import team2.lmssystem.dto.respond.LeaveResponse;
+import team2.lmssystem.dto.respond.LeaveTypeResponse;
 import team2.lmssystem.service.leaveservice.LeaveService;
 
 import java.security.Principal;
@@ -64,6 +65,17 @@ public class EmployeeController {
                 .success(true)
                 .message("Leave balances fetched successfully")
                 .data(leaveService.getLeaveBalances(principal.getName()))
+                .build());
+    }
+
+    /** Get all available leave types — used to populate the apply-leave dropdown. */
+    @GetMapping("/leave/types")
+    public ResponseEntity<ApiResponse<List<LeaveTypeResponse>>> getLeaveTypes() {
+
+        return ResponseEntity.ok(ApiResponse.<List<LeaveTypeResponse>>builder()
+                .success(true)
+                .message("Leave types fetched successfully")
+                .data(leaveService.getAllLeaveTypes())
                 .build());
     }
 }

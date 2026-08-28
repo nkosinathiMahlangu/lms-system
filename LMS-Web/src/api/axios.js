@@ -1,7 +1,9 @@
 import axios from 'axios'
 
+// Local dev: empty baseURL → Vite proxy forwards /api to localhost:8080
+// Production: VITE_API_URL points to the Railway backend (e.g. https://xxx.railway.app)
 const api = axios.create({
-  baseURL: '',          // Vite proxy forwards /auth /employee /admin → :8080
+  baseURL: import.meta.env.VITE_API_URL || '',
   headers: { 'Content-Type': 'application/json' },
 })
 
@@ -12,29 +14,25 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-// Normalise error so err.message always holds the backend's human-readable text
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401) {
-      // Only hard-redirect when a token exists (session expired), not on the
-      // login page itself (wrong password also returns 401).
-      const token = localStorage.getItem('lms_token')
-      if (token) {
-        localStorage.removeItem('lms_token')
-        localStorage.removeItem('lms_user')
-        window.location.href = '/login'
-      }
+    const status     = err.response?.status
+    const requestUrl = err.config?.url ?? ''
+
+    // 401 on anything except auth endpoints = token expired → kick to login
+    if (status === 401 && !requestUrl.includes('/api/auth/')) {
+      localStorage.removeItem('lms_token')
+      localStorage.removeItem('lms_user')
+      setTimeout(() => { window.location.href = '/login' }, 300)
     }
 
-    // Prefer the message inside the ApiResponse envelope; fall back to
-    // the raw axios message so callers can always do err.message.
-    const backendMessage =
+    // Normalise so callers always read err.message
+    err.message =
       err.response?.data?.message ||
-      err.response?.data?.error ||
+      err.response?.data?.error   ||
       err.message
 
-    err.message = backendMessage
     return Promise.reject(err)
   }
 )

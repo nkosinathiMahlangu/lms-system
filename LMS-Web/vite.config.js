@@ -6,9 +6,13 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      '/auth': 'http://localhost:8080',
-      '/employee': 'http://localhost:8080',
-      '/admin': 'http://localhost:8080',
+      // ALL backend calls start with /api — this is the only rule needed.
+      // Frontend routes (/employee, /admin, etc.) never start with /api
+      // so Vite serves index.html for them — fixing the refresh 403 for good.
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
     },
   },
 })

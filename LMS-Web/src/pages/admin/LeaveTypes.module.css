@@ -30,6 +30,15 @@
 
 .emptyCell { text-align: center; color: var(--grey-mid); padding: 24px; }
 
+.dim { color: var(--grey-mid); font-size: 13px; }
+
+.inlineErr {
+  display: block;
+  font-size: 11px;
+  color: var(--red);
+  margin-top: 3px;
+}
+
 .inlineInput {
   padding: 7px 10px;
   border: 1.5px solid var(--orange);

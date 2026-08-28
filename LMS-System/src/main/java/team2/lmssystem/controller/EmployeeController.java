@@ -16,7 +16,7 @@ import java.util.List;
 
 /** Employee-only endpoints — requires ROLE_EMPLOYEE. */
 @RestController
-@RequestMapping("/employee")
+@RequestMapping("/api/employee")
 @RequiredArgsConstructor
 public class EmployeeController {
 

@@ -79,7 +79,7 @@ export default function ManageUsers() {
                 <label>First Name</label>
                 <input
                   {...register('firstName', { required: 'Required' })}
-                  placeholder="John"
+                  placeholder="Nathi"
                 />
                 {errors.firstName && <span className={styles.err}>{errors.firstName.message}</span>}
               </div>
@@ -88,7 +88,7 @@ export default function ManageUsers() {
                 <label>Last Name</label>
                 <input
                   {...register('lastName', { required: 'Required' })}
-                  placeholder="Doe"
+                  placeholder="Mahlangu"
                 />
                 {errors.lastName && <span className={styles.err}>{errors.lastName.message}</span>}
               </div>
@@ -97,7 +97,7 @@ export default function ManageUsers() {
                 <label>Username</label>
                 <input
                   {...register('username', { required: 'Required' })}
-                  placeholder="johndoe"
+                  placeholder="nathi"
                 />
                 {errors.username && <span className={styles.err}>{errors.username.message}</span>}
               </div>
@@ -110,7 +110,7 @@ export default function ManageUsers() {
                     required: 'Required',
                     pattern: { value: /\S+@\S+\.\S+/, message: 'Enter a valid email' },
                   })}
-                  placeholder="john@company.com"
+                  placeholder="nathi@company.com"
                 />
                 {errors.email && <span className={styles.err}>{errors.email.message}</span>}
               </div>

@@ -14,4 +14,10 @@ public interface LeaveBalanceRepository extends JpaRepository<LeaveBalance, Long
     Optional<LeaveBalance> findByUserAndLeaveType(User user, LeaveType leaveType);
 
     List<LeaveBalance> findByUser(User user);
+
+    // Used when deleting a user — remove all their balances first
+    void deleteByUser(User user);
+
+    // Used when deleting a leave type — remove all balances for that type first
+    void deleteByLeaveType(LeaveType leaveType);
 }

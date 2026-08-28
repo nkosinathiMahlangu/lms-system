@@ -1,5 +1,6 @@
 package team2.lmssystem.service.userservice.implement;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import team2.lmssystem.exception.BadRequestException;
 import team2.lmssystem.exception.DuplicateResourceException;
 import team2.lmssystem.exception.ResourceNotFoundException;
 import team2.lmssystem.repository.LeaveBalanceRepository;
+import team2.lmssystem.repository.LeaveRequestRepository;
 import team2.lmssystem.repository.LeaveTypeRepository;
 import team2.lmssystem.repository.RoleRepository;
 import team2.lmssystem.repository.UserRepository;
@@ -30,6 +32,7 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepository;
     private final LeaveTypeRepository leaveTypeRepository;
     private final LeaveBalanceRepository leaveBalanceRepository;
+    private final LeaveRequestRepository leaveRequestRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -88,6 +91,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public String deleteUser(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
@@ -98,8 +102,13 @@ public class UserServiceImpl implements UserService {
                 .anyMatch(role -> role.getName() == RoleName.ADMIN);
 
         if (isAdmin) {
-            throw new BadRequestException("Admin accounts cannot be deleted through this endpoint");
+            throw new BadRequestException("Admin accounts cannot be deleted");
         }
+
+        // Delete child records first to satisfy FK constraints:
+        // leave_requests and leave_balances both reference users(user_id)
+        leaveRequestRepository.deleteByUser(user);
+        leaveBalanceRepository.deleteByUser(user);
 
         userRepository.delete(user);
         return "Employee '" + user.getUsername() + "' deleted successfully";

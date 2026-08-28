@@ -19,4 +19,10 @@ public interface LeaveRequestRepository extends JpaRepository<LeaveRequest, Long
 
     // Used to block duplicate pending requests for the same leave type
     boolean existsByUserAndLeaveTypeAndStatus(User user, LeaveType leaveType, LeaveStatus status);
+
+    // Used when deleting a user — remove all their requests first
+    void deleteByUser(User user);
+
+    // Used when deleting a leave type — remove all requests for that type first
+    void deleteByLeaveType(LeaveType leaveType);
 }

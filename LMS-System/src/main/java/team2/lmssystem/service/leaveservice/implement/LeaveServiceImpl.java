@@ -1,5 +1,6 @@
 package team2.lmssystem.service.leaveservice.implement;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import team2.lmssystem.dto.request.ApplyLeaveRequest;
@@ -237,6 +238,7 @@ public class LeaveServiceImpl implements LeaveService {
     }
 
     @Override
+    @Transactional
     public String deleteLeaveType(Long id) {
         LeaveType leaveType = leaveTypeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("LeaveType", "id", id));
@@ -251,8 +253,14 @@ public class LeaveServiceImpl implements LeaveService {
         if (hasPendingRequests) {
             throw new BadRequestException(
                     "Cannot delete '" + leaveType.getName()
-                            + "' — there are pending leave requests for this type.");
+                            + "' — there are pending leave requests for this type. "
+                            + "Action them first (approve or reject) before deleting.");
         }
+
+        // Remove all leave requests for this type (approved/rejected history) and
+        // all employee balances — both reference leave_type_id via FK
+        leaveRequestRepository.deleteByLeaveType(leaveType);
+        leaveBalanceRepository.deleteByLeaveType(leaveType);
 
         leaveTypeRepository.delete(leaveType);
         return "Leave type '" + leaveType.getName() + "' deleted successfully";

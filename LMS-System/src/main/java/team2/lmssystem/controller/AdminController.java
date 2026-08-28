@@ -19,7 +19,7 @@ import java.util.List;
 
 /** Admin-only endpoints — requires ROLE_ADMIN. */
 @RestController
-@RequestMapping("/admin")
+@RequestMapping("/api/admin")
 @RequiredArgsConstructor
 public class AdminController {
 

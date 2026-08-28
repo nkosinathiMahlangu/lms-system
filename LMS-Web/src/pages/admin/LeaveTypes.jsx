@@ -6,10 +6,10 @@ import Spinner from '../../components/Spinner'
 import styles from './LeaveTypes.module.css'
 
 export default function LeaveTypes() {
-  const [types,    setTypes]    = useState([])
-  const [loading,  setLoading]  = useState(true)
-  const [editId,   setEditId]   = useState(null)
-  const [saving,   setSaving]   = useState(false)
+  const [types,   setTypes]   = useState([])
+  const [loading, setLoading] = useState(true)
+  const [editId,  setEditId]  = useState(null)
+  const [saving,  setSaving]  = useState(false)
 
   const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm()
 
@@ -26,7 +26,6 @@ export default function LeaveTypes() {
   const startEdit = (t) => {
     setEditId(t.id)
     setValue('name', t.name)
-    setValue('defaultDays', t.defaultDays)
   }
 
   const cancelEdit = () => { setEditId(null); reset() }
@@ -34,24 +33,28 @@ export default function LeaveTypes() {
   const onSave = async (data) => {
     setSaving(true)
     try {
-      await updateLeaveType(editId, { name: data.name, defaultDays: Number(data.defaultDays) })
+      // Backend UpdateLeaveTypeRequest only accepts { name } — defaultDays is not editable
+      await updateLeaveType(editId, { name: data.name })
       toast.success('Leave type updated')
       setEditId(null)
       reset()
       load()
     } catch (err) {
-      toast.error(err.response?.data?.message ?? 'Update failed')
+      // err.message is already normalised by the axios interceptor
+      toast.error(err.message || 'Update failed')
     } finally { setSaving(false) }
   }
 
   const onDelete = async (id, name) => {
-    if (!window.confirm(`Delete leave type "${name}"?`)) return
+    if (!window.confirm(`Delete leave type "${name}"?\n\nThis will fail if employees have balances or leave history linked to it.`)) return
     try {
       await deleteLeaveType(id)
-      toast.success('Deleted')
+      toast.success(`"${name}" deleted`)
       load()
     } catch (err) {
-      toast.error(err.response?.data?.message ?? 'Delete failed')
+      // err.message carries the exact backend error, e.g.
+      // "Cannot delete 'Annual Leave' — there are pending leave requests for this type."
+      toast.error(err.message || 'Delete failed', { duration: 6000 })
     }
   }
 
@@ -72,36 +75,54 @@ export default function LeaveTypes() {
           </thead>
           <tbody>
             {types.length === 0 ? (
-              <tr><td colSpan={3} className={styles.emptyCell}>No leave types configured.</td></tr>
+              <tr>
+                <td colSpan={3} className={styles.emptyCell}>No leave types configured.</td>
+              </tr>
             ) : types.map((t) => (
               <tr key={t.id}>
                 {editId === t.id ? (
+                  /* ── Edit row — only name is editable ── */
                   <>
                     <td>
-                      <input className={styles.inlineInput} {...register('name', { required: true })} />
+                      <input
+                        className={styles.inlineInput}
+                        placeholder="Leave type name"
+                        {...register('name', { required: 'Name is required' })}
+                      />
+                      {errors.name && (
+                        <span className={styles.inlineErr}>{errors.name.message}</span>
+                      )}
                     </td>
-                    <td>
-                      <input className={styles.inlineInput} style={{ width: 80 }}
-                        type="number" min={1}
-                        {...register('defaultDays', { required: true, min: 1 })} />
-                    </td>
+                    {/* Default days is read-only — shown but not editable */}
+                    <td className={styles.dim}>{t.defaultDays} days</td>
                     <td>
                       <div className={styles.btnGroup}>
-                        <button className={styles.saveBtn} disabled={saving} onClick={handleSubmit(onSave)}>
+                        <button
+                          className={styles.saveBtn}
+                          disabled={saving}
+                          onClick={handleSubmit(onSave)}
+                        >
                           {saving ? '…' : 'Save'}
                         </button>
-                        <button className={styles.cancelBtn} onClick={cancelEdit}>Cancel</button>
+                        <button className={styles.cancelBtn} onClick={cancelEdit}>
+                          Cancel
+                        </button>
                       </div>
                     </td>
                   </>
                 ) : (
+                  /* ── Display row ── */
                   <>
                     <td><strong>{t.name}</strong></td>
                     <td>{t.defaultDays} days</td>
                     <td>
                       <div className={styles.btnGroup}>
-                        <button className={styles.editBtn} onClick={() => startEdit(t)}>Edit</button>
-                        <button className={styles.deleteBtn} onClick={() => onDelete(t.id, t.name)}>Delete</button>
+                        <button className={styles.editBtn} onClick={() => startEdit(t)}>
+                          Edit
+                        </button>
+                        <button className={styles.deleteBtn} onClick={() => onDelete(t.id, t.name)}>
+                          Delete
+                        </button>
                       </div>
                     </td>
                   </>

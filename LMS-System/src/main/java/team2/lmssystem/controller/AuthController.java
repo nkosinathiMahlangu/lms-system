@@ -16,7 +16,7 @@ import team2.lmssystem.service.authservice.AuthService;
 
 /** Public authentication endpoints — no JWT required. */
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
 

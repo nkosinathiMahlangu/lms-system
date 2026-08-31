@@ -61,10 +61,9 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        // Split comma-separated origins from properties
-        // Local: http://localhost:5173
-        // Production: https://your-app.vercel.app
-        config.setAllowedOrigins(List.of(allowedOrigins.split(",")));
+        // Use allowedOriginPatterns (not allowedOrigins) so it also works with
+        // Vercel preview deployment URLs, and plays nice with allowCredentials
+        config.setAllowedOriginPatterns(List.of(allowedOrigins.split(",")));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
